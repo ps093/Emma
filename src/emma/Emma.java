@@ -39,6 +39,7 @@ public class Emma {
         InputStream sentencesIn = null;
         InputStream tokenIn = null;
         InputStream personIn = null;
+        InputStream locationIn = null;
 
         //nur ab hier coden
         try {
@@ -60,16 +61,21 @@ public class Emma {
             personIn = new FileInputStream("en-ner-person.bin");
             TokenNameFinderModel person = new TokenNameFinderModel(personIn);
             NameFinderME nameFinder = new NameFinderME(person);
+            
+            locationIn = new FileInputStream("en-ner-location.bin");
+            TokenNameFinderModel location = new TokenNameFinderModel(locationIn);
+            NameFinderME locationFinder = new NameFinderME(location);
 
             for (i = 0; i < sentences.length; i++) {
                 String tokens[] = tokenizer.tokenize(sentences[i]);
 
                 Span nameSpans[] = nameFinder.find(tokens);
+                Span locationSpans[] = locationFinder.find(tokens);
                 
                  
-
-                for (j = 0; j < nameSpans.length; j++) {
-                    for (int k = nameSpans[j].getStart(); k < nameSpans[j].getEnd(); k++) {
+                    
+                for (j = 0; j < locationSpans.length; j++) {
+                    for (int k = locationSpans[j].getStart(); k < locationSpans[j].getEnd(); k++) {
                         System.out.println(tokens[k]);
                     }
                 }
