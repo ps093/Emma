@@ -5,11 +5,19 @@
  */
 package emma;
 
+import static com.oracle.webservices.internal.api.databinding.DatabindingModeFeature.builder;
+import static com.oracle.webservices.internal.api.databinding.ExternalMetadataFeature.builder;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.FileInputStream;
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
+import static java.util.stream.DoubleStream.builder;
+import static java.util.stream.IntStream.builder;
+import static java.util.stream.LongStream.builder;
+import static java.util.stream.Stream.builder;
 import opennlp.tools.namefind.NameFinderME;
 import opennlp.tools.namefind.TokenNameFinderModel;
 import opennlp.tools.sentdetect.SentenceDetector;
@@ -71,12 +79,26 @@ public class Emma {
 
                 Span nameSpans[] = nameFinder.find(tokens);
                 Span locationSpans[] = locationFinder.find(tokens);
+                StringBuilder name = new StringBuilder();
+                HashSet<String> names=new HashSet<String> ();
+                
                 
                  
                     
-                for (j = 0; j < locationSpans.length; j++) {
-                    for (int k = locationSpans[j].getStart(); k < locationSpans[j].getEnd(); k++) {
-                        System.out.println(tokens[k]);
+                for (j = 0; j < nameSpans.length; j++) {
+                    for (int k = nameSpans[j].getStart(); k < nameSpans[j].getEnd(); k++) {
+                         if(k> nameSpans[j].getStart()){ name.append(" ");}
+                        name.append(tokens[k]);
+                        names.add( name );
+                        System.out.println(names);
+                        
+                        System.out.println("Elements using iterator:");
+		Iterator<String> it = names.iterator();
+		while (it.hasNext())
+		{
+			System.out.println(it.next());
+		}
+                        
                     }
                 }
             }
