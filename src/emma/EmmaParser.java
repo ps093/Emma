@@ -54,6 +54,8 @@ public class EmmaParser {
 
         while ((aLine = bf.readLine()) != null) {
             numberOfLines++;
+            
+            
         }
         bf.close();
         return numberOfLines;
