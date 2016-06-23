@@ -70,7 +70,7 @@ public class Emma {
                 b++;
 
             }
-
+                System.out.println(b);                                                 //Anzahl der Namen in der Namensliste
             aryLines = aryLines.replaceAll("--", " - ");                             //Oft wird "--" ohne Leerzeichen zwischen dem Text als Gedankenstrich benutzt dadurch entstehen falsche Tokens.
 
             
@@ -137,13 +137,14 @@ public class Emma {
              //System.out.println(names1);
              }*/
             List<String> list = new ArrayList<String>(names);   
-
+            
             for (int a = 0; a < b; a++) {                                           //Alle Namen die in der 'Perfekten Namens Liste' sind raus werfen.
 
                 list.remove(aryLines_CL[a]);
             }
 
             System.out.println("\nArrayList contains: " + list);
+            System.out.println(list.size());                                        //Namen die erkannt werden aber noch nicht mit anderen zusammen gefast werden konnten
 
             //nur bis hier coden      
         } catch (IOException e) {
