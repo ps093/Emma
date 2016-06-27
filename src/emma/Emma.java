@@ -37,6 +37,7 @@ import opennlp.tools.util.Span;
 public class Emma {
 
     private static SentenceModel model;
+    
 
     /**
      * @param args the command line arguments
@@ -57,12 +58,15 @@ public class Emma {
             EmmaParser file = new EmmaParser(file_name);
             CharakterList fileCL = new CharakterList(file_name_CL);
             String aryLines = file.OpenFile();
-
             String[] aryLines_CL = fileCL.OpenFileCL();
+            
+            
             int b = 0;
             int i = 0;
             int j = 0;
             // int l = 0;
+            
+            
             HashSet<String> names = new HashSet<String>();
             
             for (int c = 0; c < aryLines_CL.length; c++) {
@@ -70,7 +74,7 @@ public class Emma {
                 b++;
 
             }
-                System.out.println(b);                                                 //Anzahl der Namen in der Namensliste
+                System.out.println(b+1);                                             //Anzahl der Namen in der Namensliste
             aryLines = aryLines.replaceAll("--", " - ");                             //Oft wird "--" ohne Leerzeichen zwischen dem Text als Gedankenstrich benutzt dadurch entstehen falsche Tokens.
 
             
@@ -138,19 +142,54 @@ public class Emma {
              }*/
             List<String> list = new ArrayList<String>(names);   
             
-            for (int a = 0; a < b; a++) {                                           //Alle Namen die in der 'Perfekten Namens Liste' sind raus werfen.
-
-                list.remove(aryLines_CL[a]);
+                   
+    
+    
+    
+                                                   
+   
+            
+            
+            for (int a = 0; a < b; a++) { 
+                 
+                list.remove(aryLines_CL[a]);                                        //Alle Namen die in der 'Perfekten Namens Liste' sind raus werfen.
             }
-
+            
+            
             System.out.println("\nArrayList contains: " + list);
             System.out.println(list.size());                                        //Namen die erkannt werden aber noch nicht mit anderen zusammen gefast werden konnten
-
+                
+                       StringBuilder tolhs = new StringBuilder ();
+                       StringBuilder torhs = new StringBuilder ();
+                        for (int a=0; a<b; a++){
+                            tolhs.append(aryLines_CL[a]);
+                            for (int c=0; c<list.size(); c++){
+                                torhs.append(list.get(c));
+                                
+                                
+                                
+                                if (distance = true){
+                                    list.remove(c);
+                                }
+                                torhs.setLength(0);
+                            }
+                            
+                            
+                            
+                            
+                            tolhs.setLength(0);
+                        }
+               
+    
+            
             //nur bis hier coden      
         } catch (IOException e) {
             throw new RuntimeException(e);
 
         }
+        
+        
+        
 
     }
 

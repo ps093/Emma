@@ -31,7 +31,7 @@ public class EmmaParser {
 
         int numberOfLines = readLines();
 
-        String textData = "";
+        String textData = " ";
 
         int i;
 
