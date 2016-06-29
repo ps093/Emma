@@ -74,7 +74,7 @@ public class Emma {
                 b++;
 
             }
-                System.out.println(b+1);                                             //Anzahl der Namen in der Namensliste
+                System.out.println("\nInsgesamt: " + b + " Namen" );                                             //Anzahl der Namen in der Namensliste
             aryLines = aryLines.replaceAll("--", " - ");                             //Oft wird "--" ohne Leerzeichen zwischen dem Text als Gedankenstrich benutzt dadurch entstehen falsche Tokens.
 
             
@@ -140,35 +140,54 @@ public class Emma {
              String names1 = (String) it.next();
              //System.out.println(names1);
              }*/
-            List<String> list = new ArrayList<String>(names);   
-            
-                   
-    
-    
-    
-                                                   
-   
+            List<String> list = new ArrayList<String>(names);
             
             
+            StringBuilder matchednames = new StringBuilder ();
+            StringBuilder notmatchednames = new StringBuilder ();
+            
+            
+            int t=0;
+            int s=0;
             for (int a = 0; a < b; a++) { 
-                 
+                    
+                     if(list.indexOf(aryLines_CL[a])>-1){           
+                matchednames.append(aryLines_CL[a]).append("\n");
+                t++;
+                     }
+                     if(list.indexOf(aryLines_CL[a])==-1){
+                         notmatchednames.append(aryLines_CL[a]).append("\n");
+                s++;
+                     }
                 list.remove(aryLines_CL[a]);                                        //Alle Namen die in der 'Perfekten Namens Liste' sind raus werfen.
             }
             
+            System.out.println("\nDie gefundenen Namen:\n" + matchednames + "\nInsgesamt: " + t + " Namen");
+            System.out.println("\nDie nicht gefundenen Namen:\n" + notmatchednames + "\nInsgesamt: " + s + " Namen");
+            System.out.println("\nDie Namen die OPENNLP findet und sich nicht zuordnen lassen: " + list);
+            System.out.println("Insgesamt: " + list.size() + " Namen");                                        //Namen die erkannt werden aber noch nicht mit anderen zusammen gefast werden konnten
             
-            System.out.println("\nArrayList contains: " + list);
-            System.out.println(list.size());                                        //Namen die erkannt werden aber noch nicht mit anderen zusammen gefast werden konnten
-                
+            /*
                        StringBuilder tolhs = new StringBuilder ();
                        StringBuilder torhs = new StringBuilder ();
+                       StringBuilder namevariant = new StringBuilder ();
+                       
                         for (int a=0; a<b; a++){
                             tolhs.append(aryLines_CL[a]);
+                            
+                            
+                            
+                            
                             for (int c=0; c<list.size(); c++){
                                 torhs.append(list.get(c));
                                 
                                 
                                 
                                 if (distance = true){
+                                    
+                                    namevariant.append(list.get(c));
+                                    namevariant.append("\n");
+                                    
                                     list.remove(c);
                                 }
                                 torhs.setLength(0);
@@ -179,7 +198,9 @@ public class Emma {
                             
                             tolhs.setLength(0);
                         }
-               
+                        
+                        System.out.println("\nDie Namensvarianten sind: ");
+               */
     
             
             //nur bis hier coden      
