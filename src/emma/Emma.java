@@ -180,9 +180,8 @@ public class Emma {
                     if (singlenamesod.contains(singlenamesl[sl])) {
                         System.out.println(list.get(a));
                         list.remove(a);
-
+                        break;
                     }
-                    break;
 
                 }
             }
