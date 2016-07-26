@@ -1,14 +1,14 @@
-/*
+/**
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
- 
+ */
 package emma;
 
 /**
  *
  * @author Patrick
- 
+ */
 public class Levenstheindistance {
 
      
@@ -36,11 +36,12 @@ public class Levenstheindistance {
                         distance[d - 1][e] + 1,                                  
                         distance[d][e - 1] + 1,                                  
                         distance[d - 1][e - 1] + ((lhs.charAt(d - 1) == rhs.charAt(e - 1)) ? 0 : 1));
-                                                                                 
-        return distance[lhs.length()][rhs.length()];                           
+                                                                             
+        return distance[lhs.length()][rhs.length()];  
+       
     }                                                                            
+   
 
     
     
 }
-*/

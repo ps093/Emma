@@ -9,10 +9,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.FileInputStream;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
-import java.util.regex.Pattern;
 import opennlp.tools.namefind.NameFinderME;
 import opennlp.tools.namefind.TokenNameFinderModel;
 import opennlp.tools.sentdetect.SentenceDetectorME;
@@ -63,9 +61,10 @@ public class Emma {
             int bnFL = 0;
             int bFL = 0;
 
-            HashSet<String> names = new HashSet<String>();
-            HashSet<String> locations = new HashSet<String>();
-            HashSet<String> singlenameshs = new HashSet<String>();
+            HashSet<String> names = new HashSet<>();
+            HashSet<String> locations = new HashSet<>();
+            HashSet<String> singlenameshs = new HashSet<>();
+            HashSet<String> namevariantshs = new HashSet<>();
 
             System.out.println("Alle erfundenen Orte:\n");
             for (int c = 0; c < aryLines_LLF.length; c++) {
@@ -74,14 +73,14 @@ public class Emma {
             }
             System.out.println("\nInsgesamt: " + bFL + " Fictional locations\n");       //Anzahl der erfundenen Namen in der Liste
 
-            System.out.println("Alle echten Orte:\n");
+            System.out.println("\nAlle echten Orte:\n");
             for (int c = 0; c < aryLines_LLnF.length; c++) {
                 System.out.println(aryLines_LLnF[c]);
                 bnFL++;
             }
             System.out.println("\nInsgesamt: " + bnFL + " non-fictional locations\n");    //Anzahl der Echten Orte in der Liste
 
-            System.out.println("Alle Namen Laut Fan-Wiki:\n");
+            System.out.println("\nAlle Namen Laut Fan-Wiki:\n");
             for (int c = 0; c < aryLines_CL.length; c++) {
                 System.out.println(aryLines_CL[c]);
                 b++;
@@ -144,7 +143,7 @@ public class Emma {
                 }
             }
 
-            List<String> list = new ArrayList<String>(names);
+            List<String> list = new ArrayList<>(names);
 
             StringBuilder matchednames = new StringBuilder();
             StringBuilder notmatchednames = new StringBuilder();
@@ -165,34 +164,80 @@ public class Emma {
                 list.remove(aryLines_CL[a]);                                        //Alle Namen die in der 'Perfekten Namens Liste' sind raus werfen.
             }
 
-            for (int a = 0; a < aryLines_CL.length; a++) {                          //Die Erkannten Namen die merkwürdig erkannt wurden rausschmeissen
+            StringBuilder namevariantsl = new StringBuilder();                     //Jetzt werden die Namen tasächlich verglichen.
+            StringBuilder tolhs = new StringBuilder();                             //Zunächst werden die Vor- und Zunamen zusammen verglichen
+            StringBuilder torhs = new StringBuilder();                             //ansonsten wären diese durch die Feinere abfrage mit den getrennten Namen Rausgeflogen (zeigt nur die möglichkeiten der LSD)
+            StringBuilder namevariant = new StringBuilder();                       //danach wird mit beidem getrennt verglichen um die Reste aus zu räumen
+
+            namevariant.append("\n\naus dem Werk:\t\t\taus der Namensliste:\n");
+            for (int a = 0; a < b; a++) {
+                tolhs.append(aryLines_CL[a]);
+
+                for (int c = 0; c < list.size(); c++) {
+                    torhs.append(list.get(c));
+
+                    int distance = Levenstheindistance.computeLevenshteinDistance(tolhs, torhs);
+
+                    if (distance <= 1) {
+
+                        namevariant.append("\n").append(list.get(c)).append("\t\t=\t").append(aryLines_CL[a]);
+
+                        list.set(c, "kkk");
+                    }
+                    torhs.setLength(0);
+                }
+
+                tolhs.setLength(0);
+            }
+
+            for (int a = 0; a < aryLines_CL.length; a++) {
                 String[] singlenames = aryLines_CL[a].split(" ");
                 for (int sl = 0; sl < singlenames.length; sl++) {
                     singlenameshs.add(singlenames[sl]);
                 }
             }
+
             List<String> singlenamesod = new ArrayList<>(singlenameshs);
 
             for (int a = 0; a < list.size(); a++) {
                 String[] singlenamesl = list.get(a).split(" ");
                 for (int sl = 0; sl < singlenamesl.length; sl++) {
-                    //System.out.println(singlenamesl[sl]);
-                    if (singlenamesod.contains(singlenamesl[sl])) {
-                        System.out.println(list.get(a));
-                        list.remove(a);
-                        break;
-                    }
+                    for (int asnod = 0; asnod < singlenamesod.size(); asnod++) {
 
+                        //System.out.println(singlenamesod.get(asnod) + "\twird verglichen mit:\t" + singlenamesl[sl]);
+                        int distancesn = Levenstheindistance.computeLevenshteinDistance(singlenamesod.get(asnod), singlenamesl[sl]);
+
+                        if (distancesn == 1) {
+                            namevariantsl.append("\n").append(singlenamesod.get(asnod)).append(" = ").append(singlenamesl[sl]);
+                            list.set(a, "kkk");                                                                                         //mit löschen wird die position geändert deshalb ein platzhalter
+                        }
+
+                        if (distancesn < 1) {
+                            namevariantshs.add(singlenamesod.get(asnod));
+                            list.set(a, "kkk");
+                        }
+                        //if (singlenamesod.contains(singlenamesl[sl])) {               der erste versuch war erst den falsch zusammengesetzten blödsinn rauswerfen und dann die LSD berechnen
+                        //   System.out.println(list.get(a));                        macht aber in der rechenzeit keinen unterschied und so sind die Daten besser
+                        // list.set(a, "kkk");
+                        //  }
+                    }
                 }
+
             }
 
-            System.out.println(singlenamesod);                                                                  // Alle 'einzel namen'(vor und zu name getrennt und Anreden und titel) anzeigen
-            System.out.println("\nDie gefundenen Namen:\n" + matchednames + "\nInsgesamt: " + t + " Namen gefunden");
-            System.out.println("\nDie nicht gefundenen Namen:\n" + notmatchednames + "\nInsgesamt: " + s + " Namen nicht gefunden");
-            System.out.println("\nDie Namen die OPENNLP findet und sich nicht zuordnen lassen: " + list);
-            System.out.println("Insgesamt: " + list.size() + " Namen");                                        //Namen die erkannt werden aber noch nicht mit anderen zusammen gefast werden konnten
+            while (list.remove("kkk")) {                                                //jetzt den Platzhalter löschen
+                list.remove("kkk");
+            }
 
-            List<String> locationslist = new ArrayList<String>(locations);
+            System.out.println("\nDie Namensvarianten als Einzelnamen sind:\n" + namevariantsl + "\n");
+            System.out.println("\nNamen die durch das Zusammensetzen falsch geworden sind\n\n" + namevariantshs + "\n" + "\nInsgesamt: " + namevariantshs.size() + " Namen ohne Dupletten\n");
+            System.out.println("\nDie Namensvarianten mit Vor- und Zuname sind:" + namevariant + "\n");
+            System.out.println("\nDie gefundenen Namen:\n\n" + matchednames + "\nInsgesamt: " + t + " Namen gefunden\n");
+            System.out.println("\nDie nicht gefundenen Namen:\n\n" + notmatchednames + "\nInsgesamt: " + s + " Namen nicht gefunden\n");
+            System.out.println("\nDie Namen die OPENNLP findet und sich nicht zuordnen lassen:\n\n" + list);
+            System.out.println("\nInsgesamt: " + list.size() + " Namen\n");                                        //Namen die erkannt werden aber noch nicht mit anderen zusammen gefast werden konnten
+
+            List<String> locationslist = new ArrayList<>(locations);
 
             StringBuilder matchedFL = new StringBuilder();
             StringBuilder notmatchedFL = new StringBuilder();
@@ -232,47 +277,13 @@ public class Emma {
                 locationslist.remove(aryLines_LLnF[a]);                                        //Alle Namen die in der 'LocationListnonFictional' sind raus werfen.
             }
 
-            System.out.println("\nDie gefundenen non fictional locations:\n" + matchednFL + "\nInsgesamt: " + tnFL + " nonfictional locations gefunden");
-            System.out.println("\nDie nicht gefundenen non fictional locations:\n" + notmatchednFL + "\nInsgesamt: " + snFL + " nonfictional Locations nicht gefunden");
-            System.out.println("\nDie gefundenen fictional locations:\n" + matchedFL + "\nInsgesamt: " + tFL + " fictional locations gefunden");
-            System.out.println("\nDie nicht gefundenen fictional locations:\n" + notmatchedFL + "\nInsgesamt: " + sFL + " fictional Locations nicht gefunden");
+            System.out.println("\nDie gefundenen non fictional locations:\n\n" + matchednFL + "\nInsgesamt: " + tnFL + " nonfictional locations gefunden\n");
+            System.out.println("\nDie nicht gefundenen non fictional locations:\n\n" + notmatchednFL + "\nInsgesamt: " + snFL + " nonfictional Locations nicht gefunden\n");
+            System.out.println("\nDie gefundenen fictional locations:\n\n" + matchedFL + "\nInsgesamt: " + tFL + " fictional locations gefunden\n");
+            System.out.println("\nDie nicht gefundenen fictional locations:\n\n" + notmatchedFL + "\nInsgesamt: " + sFL + " fictional Locations nicht gefunden\n");
             System.out.println("\nDie übrigen gefundenen Orte sind: " + locationslist);
-            System.out.println("Insgesamt: " + locationslist.size() + " Orte");
+            System.out.println("\nInsgesamt: " + locationslist.size() + " Orte\n");
 
-            /*
-             StringBuilder tolhs = new StringBuilder ();
-             StringBuilder torhs = new StringBuilder ();
-             StringBuilder namevariant = new StringBuilder ();
-                       
-             for (int a=0; a<b; a++){
-             tolhs.append(aryLines_CL[a]);
-                            
-                            
-             LevenStheindistance.compute....
-                            
-             for (int c=0; c<list.size(); c++){
-             torhs.append(list.get(c));
-                                
-                                
-                                
-             if (distance = true){                                                  //ist doch int nicht bool umbauen!!!!
-                                    
-             namevariant.append(list.get(c));
-             namevariant.append("\n");
-                                    
-             list.remove(c);
-             }
-             torhs.setLength(0);
-             }
-                            
-                            
-                            
-                            
-             tolhs.setLength(0);
-             }
-                        
-             System.out.println("\nDie Namensvarianten sind: ");
-             */
 //nur bis hier coden      
         } catch (IOException e) {
             throw new RuntimeException(e);
